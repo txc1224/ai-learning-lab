@@ -1,0 +1,14 @@
+/* 设置全局盒模型，避免尺寸计算产生额外偏差。 */
+* { box-sizing: border-box; }
+/* 设置基础字体、背景和文字颜色。 */
+body { margin: 0; font-family: Inter, system-ui, sans-serif; background: #101827; color: #f8fafc; }
+/* 将内容限制在舒适阅读宽度内。 */
+.page { min-height: 100vh; max-width: 760px; margin: 0 auto; padding: 15vh 24px; }
+/* 使用强调色提示当前学习项目身份。 */
+.eyebrow { color: #67e8f9; letter-spacing: .16em; font-size: 12px; font-weight: 700; }
+/* 设置主标题的层级和视觉重点。 */
+h1 { max-width: 620px; font-size: clamp(40px, 8vw, 76px); line-height: 1.02; margin: 20px 0; }
+/* 设置说明文字的可读宽度和颜色。 */
+.description { max-width: 560px; color: #cbd5e1; font-size: 18px; line-height: 1.7; }
+/* 将链接设计成明显的下一步操作。 */
+a { display: inline-block; margin-top: 24px; color: #101827; background: #67e8f9; padding: 12px 16px; border-radius: 10px; text-decoration: none; font-weight: 700; }
