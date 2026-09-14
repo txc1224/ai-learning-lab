@@ -23,3 +23,55 @@ export interface ErrorResponse {
   // 返回便于前端展示和日志排查的错误信息。
   error: string;
 }
+
+// 定义对话角色，限制消息只能来自用户或助手。
+export type MessageRole = "user" | "assistant";
+
+// 定义消息状态，为后续流式生成保留 pending 状态。
+export type MessageStatus = "completed" | "pending" | "failed";
+
+// 定义对话在 API 中对外展示的结构。
+export interface Conversation {
+  // 对话唯一标识。
+  id: string;
+  // 对话标题。
+  title: string;
+  // 创建时间。
+  createdAt: string;
+  // 最近更新时间。
+  updatedAt: string;
+}
+
+// 定义一条聊天消息在 API 中对外展示的结构。
+export interface Message {
+  // 消息唯一标识。
+  id: string;
+  // 所属对话标识。
+  conversationId: string;
+  // 消息角色。
+  role: MessageRole;
+  // 消息正文。
+  content: string;
+  // 消息处理状态。
+  status: MessageStatus;
+  // 创建时间。
+  createdAt: string;
+}
+
+// 定义会话详情响应，包含会话和按时间排序的消息。
+export interface ConversationDetail extends Conversation {
+  // 当前会话中的全部消息。
+  messages: Message[];
+}
+
+// 定义创建会话请求，标题可选。
+export interface CreateConversationRequest {
+  // 用户提供的可选标题。
+  title?: string;
+}
+
+// 定义发送消息请求。
+export interface CreateMessageRequest {
+  // 用户要发送的消息正文。
+  content: string;
+}

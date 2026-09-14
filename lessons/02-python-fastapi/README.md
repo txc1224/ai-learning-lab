@@ -47,7 +47,7 @@ Python AI 服务
 cd /Users/m/projects/github/ai-learning-lab
 python3 -m venv .venv
 source .venv/bin/activate
-pip install fastapi uvicorn
+python -m pip install -r lessons/02-python-fastapi/requirements.txt
 ```
 
 启动服务：
@@ -68,6 +68,19 @@ curl http://127.0.0.1:8001/health
 curl -X POST http://127.0.0.1:8001/echo \
   -H "Content-Type: application/json" \
   -d '{"message":"你好，FastAPI"}'
+```
+
+运行测试：
+
+```bash
+python -m pytest lessons/02-python-fastapi/examples/test_main.py
+```
+
+自动接口文档：
+
+```text
+http://127.0.0.1:8001/docs
+http://127.0.0.1:8001/openapi.json
 ```
 
 ## 本课和上一课的关系

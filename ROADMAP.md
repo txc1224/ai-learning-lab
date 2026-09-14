@@ -12,6 +12,7 @@
 - [第 0 课：HTTP 请求生命周期与 Koa](lessons/00-roadmap/request-lifecycle-and-koa.md)
 - [第 1 课：TypeScript/Node.js 异步编程与错误处理](lessons/01-typescript-node/README.md)
 - [第 2 课：Python 与 FastAPI](lessons/02-python-fastapi/README.md)
+- [第 3 课：PostgreSQL 与 AI 对话持久化](lessons/03-postgres-persistence/README.md)
 
 ## 阶段 2：LLM 应用基础（第 1～2 个月）
 
