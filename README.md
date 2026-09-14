@@ -29,9 +29,11 @@ TypeScript / Node.js
 
 1. 阅读 `ROADMAP.md`。
 2. 阅读 `lessons/00-roadmap/README.md`。
-3. 运行 `pnpm install`。
-4. 运行 `pnpm dev` 启动所有应用。
-5. 按课程完成练习，再进入下一个阶段。
+3. 阅读 `lessons/01-typescript-node/completion-notes.md`，完成异步基础。
+4. 阅读 `lessons/02-python-fastapi/README.md`，运行 Python 对照服务。
+5. 运行 `pnpm install`。
+6. 运行 `pnpm dev` 启动 TypeScript 应用。
+7. 按课程完成练习，再进入下一个阶段。
 
 ## 高效掌握方法
 

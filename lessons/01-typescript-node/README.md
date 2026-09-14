@@ -87,6 +87,11 @@ try {
 
 只有“被抛出的错误”才会进入 `catch`。如果函数只是返回 `{ error: ... }`，它不会自动进入 `catch`。
 
+## 课程完成笔记
+
+- [8 个问题完成笔记](./completion-notes.md)：Promise、`await`、`catch`、并行、超时、重试、计时器清理和 `assert.rejects`。
+- [代码对照表](./code-map.md)：把课程概念对应到可运行代码，并标注本课学习边界。
+
 ## AI 场景中的对应关系
 
 ```ts

@@ -1,0 +1,4 @@
+# FastAPI 提供路由、请求处理和自动接口文档。
+fastapi>=0.115,<1.0
+# Uvicorn 负责启动 ASGI Web 服务。
+uvicorn[standard]>=0.34,<1.0
