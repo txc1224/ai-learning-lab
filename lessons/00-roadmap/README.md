@@ -30,8 +30,14 @@
 - 把 echo 改成分段返回。
 - 记录你遇到的一个问题和解决过程。
 
+## 配套笔记
+
+- [HTTP 请求生命周期与 Koa 对比](./request-lifecycle-and-koa.md)：回答请求入口、响应方法、TypeScript 接口和接口排错问题，并对比原生 Node.js 与 Koa + `koa-bodyparser`。
+
 ## 本周验收
 
 - 能解释 Token、上下文窗口和流式响应。
 - 能从前端发起请求并在后端打印请求体。
 - 能说明为什么 AI 请求需要超时和错误处理。
+- 能解释 `request`、`response`、`writeHead`、`end` 和 `HealthResponse`。
+- 能用同一张请求链路图对比原生 Node.js 与 Koa。
