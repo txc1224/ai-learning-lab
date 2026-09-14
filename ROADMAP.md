@@ -7,6 +7,12 @@
 - 能使用 PostgreSQL、Redis 和 Docker。
 - 验收：前后端健康检查可运行。
 
+## 当前学习顺序
+
+- [第 0 课：HTTP 请求生命周期与 Koa](lessons/00-roadmap/request-lifecycle-and-koa.md)
+- [第 1 课：TypeScript/Node.js 异步编程与错误处理](lessons/01-typescript-node/README.md)
+- [第 2 课：Python 与 FastAPI](lessons/02-python-fastapi/README.md)
+
 ## 阶段 2：LLM 应用基础（第 1～2 个月）
 
 - 掌握 Prompt、Token、上下文和结构化输出。
