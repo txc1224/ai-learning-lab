@@ -27,8 +27,8 @@ export interface ErrorResponse {
 // 定义对话角色，限制消息只能来自用户或助手。
 export type MessageRole = "user" | "assistant";
 
-// 定义消息状态，为后续流式生成保留 pending 状态。
-export type MessageStatus = "completed" | "pending" | "failed";
+// 定义消息状态，覆盖普通生成和流式生成的生命周期。
+export type MessageStatus = "completed" | "pending" | "streaming" | "failed";
 
 // 定义对话在 API 中对外展示的结构。
 export interface Conversation {
@@ -75,3 +75,6 @@ export interface CreateMessageRequest {
   // 用户要发送的消息正文。
   content: string;
 }
+
+// 重新导出模型调用相关的共享契约。
+export * from "./llm.js";

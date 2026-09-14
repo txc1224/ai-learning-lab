@@ -32,9 +32,28 @@ TypeScript / Node.js
 3. 阅读 `lessons/01-typescript-node/completion-notes.md`，完成异步基础。
 4. 阅读 `lessons/02-python-fastapi/README.md`，运行 Python 对照服务。
 5. 阅读 `lessons/03-postgres-persistence/README.md`，启动 PostgreSQL 并完成持久化闭环。
-6. 运行 `pnpm install`。
-7. 运行 `pnpm dev` 启动 TypeScript 应用。
-8. 按课程完成练习，再进入下一个阶段。
+6. 依次阅读 `lessons/04-llm-api/` 到 `lessons/08-production/`，先看 `completion-notes.md`，再看 `code-map.md` 和示例。
+7. 运行 `pnpm install`。
+8. 运行 `pnpm dev` 启动 TypeScript 应用。
+9. 按课程完成练习，再进入下一个阶段。
+
+## 第 4～8 课统一入口
+
+- [第 4 课：LLM API、Prompt 与上下文](lessons/04-llm-api/README.md)
+- [第 5 课：SSE 流式响应](lessons/05-sse-streaming/README.md)
+- [第 6 课：RAG 知识库](lessons/06-rag/README.md)
+- [第 7 课：Agent 与工具调用](lessons/07-agent-tools/README.md)
+- [第 8 课：生产化 AI SaaS 基础](lessons/08-production/README.md)
+
+默认学习模式不需要外部 API Key：
+
+```text
+LLM_PROVIDER=mock
+RAG_PROVIDER=keyword
+AGENT_MODE=deterministic
+```
+
+真实模型、Embedding、向量数据库、外部工具和多实例部署均是后续可选升级，不会阻塞本地课程测试。
 
 ## 高效掌握方法
 

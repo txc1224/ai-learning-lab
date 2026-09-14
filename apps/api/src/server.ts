@@ -15,6 +15,26 @@ import type {
 import { closePool } from "./db-client.js";
 // 导入会话 Repository 和资源不存在错误。
 import { ConversationNotFoundError, ConversationRepository } from "./conversation-repository.js";
+// 导入聊天编排服务。
+import { ChatService } from "./chat-service.js";
+// 导入本地确定性模型 Provider。
+import { MockProvider } from "./providers/mock-provider.js";
+// 导入可选的 OpenAI 兼容 Provider。
+import { OpenAICompatibleProvider } from "./providers/openai-compatible-provider.js";
+// 导入 SSE 响应工具。
+import { startSse, writeSseEvent } from "./sse.js";
+// 导入生产化的请求追踪和限流工具。
+import { createRequestContext, log, RateLimiter, UsageMeter } from "./production/production.js";
+// 导入本地 RAG 文档清洗、切分和检索工具。
+import { loadDocument } from "./rag/document-loader.js";
+import { chunkDocument } from "./rag/chunker.js";
+import { retrieveByKeyword, buildContext } from "./rag/retriever.js";
+// 导入来源引用构建器，向调用方返回可追溯的文档位置。
+import { buildCitations } from "./rag/citation-builder.js";
+// 导入本地 Agent 工具运行器。
+import { AgentRunner, ToolRegistry, calculatorTool } from "./agent/agent-runner.js";
+// 导入随机 ID 工具，为生产化请求建立追踪上下文。
+import { randomUUID } from "node:crypto";
 
 // 读取环境变量端口，没有配置时使用本地开发常用端口。
 const port = Number(process.env.PORT ?? 3001);
@@ -24,6 +44,19 @@ const version = process.env.APP_VERSION ?? "0.1.0";
 const environment = process.env.NODE_ENV ?? "development";
 // 创建 Repository，让 HTTP 层不直接编写 SQL。
 const conversationRepository = new ConversationRepository();
+// 根据显式配置选择 Provider，默认使用不需要密钥的本地 Mock。
+const chatProvider = process.env.LLM_PROVIDER === "openai-compatible"
+  ? new OpenAICompatibleProvider()
+  : new MockProvider();
+// 创建聊天编排服务，统一管理上下文和模型调用。
+const chatService = new ChatService(conversationRepository, chatProvider);
+// 创建生产化工具实例，后续路由可以复用同一套 requestId/限流/计量。
+const requestLimiter = new RateLimiter(30, 60_000);
+const usageMeter = new UsageMeter();
+// 创建一个只允许显式注册工具的 Agent 注册表。
+const toolRegistry = new ToolRegistry();
+toolRegistry.register(calculatorTool);
+const agentRunner = new AgentRunner(toolRegistry, 5);
 
 // 把请求体读取成字符串，供 POST 接口后续解析 JSON。
 function readRequestBody(request: IncomingMessage): Promise<string> {
@@ -106,6 +139,17 @@ const server = createServer((request, response) => {
 
 // 处理单个 HTTP 请求的异步逻辑。
 async function handleRequest(request: IncomingMessage, response: ServerResponse): Promise<void> {
+  // 创建或复用请求 ID，方便日志关联同一请求的所有步骤。
+  const requestId = createRequestContext(request.headers["x-request-id"]?.toString()).requestId;
+  // 把请求 ID返回给客户端，便于用户报告问题。
+  response.setHeader("X-Request-Id", requestId);
+  // 单机固定窗口限流，保护课程服务不会被无限请求压垮。
+  if (!requestLimiter.allow(request.socket.remoteAddress ?? "anonymous")) {
+    writeJson(response, 429, { error: "rate limit exceeded" } satisfies ErrorResponse);
+    return;
+  }
+  // 记录请求进入日志，避免打印请求体等敏感信息。
+  log({ level: "info", event: "request_started", requestId, method: request.method ?? "unknown", url: request.url ?? "/" });
   // 解析路径时使用固定主机，避免依赖客户端 Host 头的格式。
   const url = new URL(request.url ?? "/", "http://localhost");
   // 取出不包含查询字符串的路径。
@@ -212,6 +256,117 @@ async function handleRequest(request: IncomingMessage, response: ServerResponse)
     }
     // 返回会话详情。
     writeJson(response, 200, conversation);
+    return;
+  }
+
+  // 使用 Provider 生成完整回复：POST /conversations/:id/chat。
+  if (request.method === "POST" && /^\/conversations\/[^/]+\/chat$/.test(pathname)) {
+    try {
+      // 从路径中提取会话 ID。
+      const chatPathMatch = /^\/conversations\/([^/]+)\/chat$/.exec(pathname);
+      if (!chatPathMatch) {
+        writeJson(response, 404, { error: "Not Found" } satisfies ErrorResponse);
+        return;
+      }
+      // 解码会话 ID。
+      const chatConversationId = decodeURIComponent(chatPathMatch[1]);
+      // 读取聊天请求。
+      const parsedBody: unknown = await parseJsonBody<CreateMessageRequest>(request);
+      // 只接受非空 content。
+      const content = isRecord(parsedBody) ? parsedBody.content : undefined;
+      if (typeof content !== "string" || content.trim().length === 0) {
+        writeJson(response, 400, { error: "content is required" } satisfies ErrorResponse);
+        return;
+      }
+      // 通过 ChatService 调用 Provider 并保存 assistant 结果。
+      const result = await chatService.generateMessage(chatConversationId, content.trim());
+      // 记录本地估算使用量。
+      usageMeter.record("default", result.result.usage.totalTokens, 0.01);
+      // 返回消息和模型元数据。
+      writeJson(response, 201, result);
+    } catch (error: unknown) {
+      if (error instanceof InvalidJsonError) {
+        writeJson(response, 400, { error: error.message } satisfies ErrorResponse);
+        return;
+      }
+      if (error instanceof ConversationNotFoundError) {
+        writeJson(response, 404, { error: "conversation not found" } satisfies ErrorResponse);
+        return;
+      }
+      throw error;
+    }
+    return;
+  }
+
+  // 使用 Provider 流式生成：POST /conversations/:id/messages/stream。
+  if (request.method === "POST" && /^\/conversations\/[^/]+\/messages\/stream$/.test(pathname)) {
+    const streamPathMatch = /^\/conversations\/([^/]+)\/messages\/stream$/.exec(pathname);
+    if (!streamPathMatch) {
+      writeJson(response, 404, { error: "Not Found" } satisfies ErrorResponse);
+      return;
+    }
+    const controller = new AbortController();
+    // 只有请求被客户端异常中止时才取消模型生成。
+    request.on("aborted", () => controller.abort());
+    // 响应关闭且还没有正常结束时，也取消底层生成。
+    response.on("close", () => {
+      if (!response.writableEnded) {
+        controller.abort();
+      }
+    });
+    // 让正常事件和错误事件共享同一个递增序号。
+    let eventId = 1;
+    try {
+      const parsedBody: unknown = await parseJsonBody<CreateMessageRequest>(request);
+      const content = isRecord(parsedBody) ? parsedBody.content : undefined;
+      if (typeof content !== "string" || content.trim().length === 0) {
+        writeJson(response, 400, { error: "content is required" } satisfies ErrorResponse);
+        return;
+      }
+      startSse(response);
+      for await (const event of chatService.streamMessage(decodeURIComponent(streamPathMatch[1]), content.trim(), controller.signal)) {
+        writeSseEvent(response, event, eventId);
+        eventId += 1;
+      }
+      response.end();
+    } catch (error: unknown) {
+      if (!response.headersSent) {
+        writeJson(response, error instanceof ConversationNotFoundError ? 404 : 500, { error: error instanceof Error ? error.message : "stream failed" } satisfies ErrorResponse);
+      } else if (!response.writableEnded) {
+        // 流已经开始时，错误必须使用 SSE 事件而不是切换成 JSON。
+        writeSseEvent(response, { type: "error", message: error instanceof Error ? error.message : "stream failed" }, eventId);
+        response.end();
+      }
+    }
+    return;
+  }
+
+  // 使用本地关键词检索：POST /rag/search。
+  if (request.method === "POST" && pathname === "/rag/search") {
+    const parsedBody: unknown = await parseJsonBody<{ query?: unknown; text?: unknown; source?: unknown }>(request);
+    const queryText = isRecord(parsedBody) && typeof parsedBody.query === "string" ? parsedBody.query : "";
+    const documentText = isRecord(parsedBody) && typeof parsedBody.text === "string" ? parsedBody.text : "";
+    const source = isRecord(parsedBody) && typeof parsedBody.source === "string" ? parsedBody.source : "inline-document";
+    const document = loadDocument({ id: randomUUID(), source, text: documentText });
+    const chunks = chunkDocument(document.id, document.source, document.text);
+    const hits = retrieveByKeyword(chunks, queryText);
+    writeJson(response, 200, { hits, citations: buildCitations(hits), context: buildContext(hits) });
+    return;
+  }
+
+  // 使用有限步 Agent 执行白名单计算工具：POST /agent/run。
+  if (request.method === "POST" && pathname === "/agent/run") {
+    const parsedBody: unknown = await parseJsonBody<{ left?: unknown; right?: unknown }>(request);
+    const left = isRecord(parsedBody) && typeof parsedBody.left === "number" ? parsedBody.left : NaN;
+    const right = isRecord(parsedBody) && typeof parsedBody.right === "number" ? parsedBody.right : NaN;
+    const state = await agentRunner.run({ runId: randomUUID(), status: "running", step: 0 }, "calculator", { left, right });
+    writeJson(response, state.status === "completed" ? 200 : 400, state);
+    return;
+  }
+
+  // 暴露本地用量统计，便于理解生产化计量边界。
+  if (request.method === "GET" && pathname === "/usage") {
+    writeJson(response, 200, usageMeter.get("default"));
     return;
   }
 

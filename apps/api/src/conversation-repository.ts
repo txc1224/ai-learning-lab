@@ -107,8 +107,8 @@ export class ConversationRepository {
     };
   }
 
-  // 保存一轮用户消息和 mock assistant 回复。
-  async appendMockTurn(conversationId: string, userContent: string): Promise<Message[]> {
+  // 保存一轮用户消息和指定的 assistant 回复。
+  async appendTurn(conversationId: string, userContent: string, assistantContent: string): Promise<Message[]> {
     // 使用事务保证用户消息和助手消息要么一起成功，要么一起回滚。
     return withTransaction(async (client) => {
       // 先确认目标会话存在，避免外键错误变成模糊的 500。
@@ -134,12 +134,12 @@ export class ConversationRepository {
 
       // 为 mock assistant 回复生成唯一标识。
       const assistantMessageId = randomUUID();
-      // 保存明确标记为 mock 的助手回复，不伪造真实模型结果。
+      // 保存调用方提供的 assistant 回复，mock 或真实 Provider 都可以复用。
       const assistantMessage = await client.query<MessageRow>(
         `INSERT INTO messages (id, conversation_id, role, content, status)
          VALUES ($1, $2, 'assistant', $3, 'completed')
          RETURNING id, conversation_id, role, content, status, created_at`,
-        [assistantMessageId, conversationId, `Mock assistant reply: ${userContent}`],
+        [assistantMessageId, conversationId, assistantContent],
       );
 
       // 更新会话更新时间，让最近有消息的会话排在前面。
@@ -151,6 +151,12 @@ export class ConversationRepository {
       // 返回这一轮写入的两条消息。
       return [toMessage(userMessage.rows[0]), toMessage(assistantMessage.rows[0])];
     });
+  }
+
+  // 保留旧课程接口名称，让第 3 课示例仍然可以运行。
+  async appendMockTurn(conversationId: string, userContent: string): Promise<Message[]> {
+    // 将旧调用转发到通用的指定回复方法。
+    return this.appendTurn(conversationId, userContent, `Mock assistant reply: ${userContent}`);
   }
 }
 
