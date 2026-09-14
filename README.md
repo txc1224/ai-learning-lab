@@ -31,9 +31,10 @@ TypeScript / Node.js
 2. 阅读 `lessons/00-roadmap/README.md`。
 3. 阅读 `lessons/01-typescript-node/completion-notes.md`，完成异步基础。
 4. 阅读 `lessons/02-python-fastapi/README.md`，运行 Python 对照服务。
-5. 运行 `pnpm install`。
-6. 运行 `pnpm dev` 启动 TypeScript 应用。
-7. 按课程完成练习，再进入下一个阶段。
+5. 阅读 `lessons/03-postgres-persistence/README.md`，启动 PostgreSQL 并完成持久化闭环。
+6. 运行 `pnpm install`。
+7. 运行 `pnpm dev` 启动 TypeScript 应用。
+8. 按课程完成练习，再进入下一个阶段。
 
 ## 高效掌握方法
 

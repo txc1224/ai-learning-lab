@@ -22,6 +22,8 @@ class HealthResponse(BaseModel):
     version: str
     # 标识当前运行环境。
     environment: str
+    # 返回当前 Python 服务运行时标识。
+    runtime: str
     # 返回服务生成响应的时间。
     timestamp: str
 
@@ -50,6 +52,7 @@ async def health() -> HealthResponse:
         service="ai-learning-lab-python-api",
         version=getenv("APP_VERSION", "0.1.0"),
         environment=getenv("APP_ENV", "development"),
+        runtime="python-fastapi",
         timestamp=datetime.now(timezone.utc).isoformat(),
     )
 

@@ -2,7 +2,21 @@
   "name": "@ai-learning-lab/api",
   "private": true,
   "type": "module",
-  "scripts": { "dev": "tsx watch src/server.ts", "build": "tsc", "typecheck": "pnpm --filter @ai-learning-lab/shared build && tsc --noEmit", "test": "node --test", "lint": "tsc --noEmit" },
-  "dependencies": { "@ai-learning-lab/shared": "workspace:*" },
-  "devDependencies": { "@types/node": "^22.10.2", "tsx": "^4.19.2", "typescript": "^5.7.2" }
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc",
+    "typecheck": "pnpm --filter @ai-learning-lab/shared build && tsc --noEmit",
+    "test": "node --test",
+    "lint": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@ai-learning-lab/shared": "workspace:*",
+    "pg": "^8.23.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "@types/pg": "^8.23.1",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
 }
