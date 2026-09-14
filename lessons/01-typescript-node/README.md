@@ -37,9 +37,25 @@ AI 应用几乎所有关键动作都是异步的：
 
 1. 先读本课概念。
 2. 运行 `examples/async-basics.ts`。
-3. 不看代码，自己重写一个异步任务。
-4. 完成 `exercises.md`。
-5. 再阅读 `common-mistakes.md`。
+3. 运行 `examples/async-basics.test.ts`，确认成功和失败分支都有测试。
+4. 阅读“代码对照表”，把每个课程概念对应到代码。
+5. 不看代码，自己重写一个异步任务。
+6. 完成 `exercises.md`。
+7. 再阅读 `common-mistakes.md`。
+
+## 运行示例和测试
+
+在仓库根目录执行：
+
+```bash
+# 运行课程示例。
+pnpm --filter @ai-learning-lab/api exec tsx ../../lessons/01-typescript-node/examples/async-basics.ts
+
+# 使用 tsx 运行 TypeScript 测试文件。
+pnpm --filter @ai-learning-lab/api exec tsx --test ../../lessons/01-typescript-node/examples/async-basics.test.ts
+```
+
+为什么测试不能直接使用 `node --test`？因为 Node.js 原生只能直接理解 JavaScript，`tsx` 负责把 TypeScript 文件转换成 Node.js 可以执行的形式。
 
 ## 核心心智模型
 
