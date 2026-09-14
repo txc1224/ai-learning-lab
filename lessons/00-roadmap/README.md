@@ -33,6 +33,7 @@
 ## 配套笔记
 
 - [HTTP 请求生命周期与 Koa 对比](./request-lifecycle-and-koa.md)：回答请求入口、响应方法、TypeScript 接口和接口排错问题，并对比原生 Node.js 与 Koa + `koa-bodyparser`。
+- 下一阶段：[TypeScript/Node.js 异步编程与错误处理](../01-typescript-node/README.md)。
 
 ## 本周验收
 
