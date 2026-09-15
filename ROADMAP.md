@@ -18,6 +18,14 @@
 - [第 6 课：RAG 知识库](lessons/06-rag/README.md)
 - [第 7 课：Agent 与工具调用](lessons/07-agent-tools/README.md)
 - [第 8 课：生产化 AI SaaS 基础](lessons/08-production/README.md)
+- [第 9 课：结构化输出与 Provider 可靠性](lessons/09-provider-reliability/README.md)
+- [第 10 课：流式持久化、幂等与恢复](lessons/10-stream-persistence/README.md)
+- [第 11 课：React AI 对话工作台](lessons/11-chat-workbench/README.md)
+- [第 12 课：RAG 接入聊天与文档管理](lessons/12-rag-chat/README.md)
+- [第 13 课：Embedding 与向量检索](lessons/13-embeddings-vector-search/README.md)
+- [第 14 课：Agent 决策循环与审批](lessons/14-agent-workflow/README.md)
+- [第 15 课：认证、RBAC 与多租户](lessons/15-auth-rbac-multitenancy/README.md)
+- [第 16 课：生产部署与可观测性](lessons/16-production-deployment/README.md)
 
 ## 阶段 2：LLM 应用基础（第 1～2 个月）
 
@@ -27,14 +35,27 @@
 - 实现流式响应和会话持久化。
 - 验收：完成 `projects/01-chat-workbench` 的对话工作台教学链路。
 
-## 第 4～8 课批量学习说明
+## 第 4～16 课批量学习说明
 
-第 4～8 课均已提供代码和笔记，但默认实现分为“本地可验证能力”和“可选真实能力”：
+第 4～16 课均已提供代码和笔记，但默认实现分为“本地可验证能力”和“可选真实能力”：
 
-- 本地可验证：Mock Provider、SSE、关键词 RAG、白名单 Agent、requestId、限流和 usage。
-- 可选真实能力：真实 LLM、真实 Embedding、向量数据库、外部工具、多实例生产部署。
+- 本地可验证：Mock Provider、SSE、关键词 RAG、Fake Embedding、内存向量库、白名单 Agent、mock auth、requestId、限流和 usage。
+- 可选真实能力：真实 LLM、真实 Embedding、pgvector/向量数据库、外部工具、OAuth、多实例生产部署、云监控。
 - 没有 API Key、外部网络或云服务时，不影响本地课程代码和单元测试。
 - 课程完成不等于真实生产验收，必须看各课笔记中的验证边界。
+
+## 第 9～16 课进阶主线
+
+```text
+第 9 课：模型输出可信（结构化 + 重试）
+→ 第 10 课：生成过程可信（流状态 + 幂等）
+→ 第 11 课：产品化（React 工作台）
+→ 第 12 课：RAG 接入聊天
+→ 第 13 课：向量检索抽象
+→ 第 14 课：Agent 工作流
+→ 第 15 课：租户与权限
+→ 第 16 课：部署与可观测
+```
 
 ## 阶段 3：RAG（第 3～5 个月）
 
