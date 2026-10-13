@@ -37,6 +37,17 @@ TypeScript / Node.js
 8. 运行 `pnpm dev` 启动 TypeScript 应用。
 9. 按课程完成练习，再进入下一个阶段。
 
+## AI 全栈实践课讲义（txc 路线）
+
+基于课程图设计的另一条学习路线：`curriculum/README.md`。
+
+- [学习路线：24 周从全栈到 Agent 开发者](curriculum/00-learning-path.md)
+- [Part 1：txc-1.0 全栈开发框架](curriculum/part1-fullstack-txc-1.0.md)
+- [Part 2：txc-2.0 Agent 基础建设](curriculum/part2-agent-foundation-txc-2.0.md)
+- [Part 3：txc-2.0 Agent 开发框架](curriculum/part3-agent-framework-txc-2.0.md)
+- [Part 4：简历智能分析系统（多 Agents 协同）](curriculum/part4-resume-multi-agent-project.md)
+- [项目亮点与面试指导](curriculum/99-interview-highlights.md)
+
 ## 第 4～16 课统一入口
 
 ### 基础应用（第 4～8 课）
