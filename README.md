@@ -24,6 +24,7 @@ TypeScript / Node.js
 - `lessons/`：课程、示例、练习和复盘。
 - `projects/01-chat-workbench/`：第一个完整实战项目。
 - `docs/`：术语、决策和排错文档。
+- `docs/reading-notes/`：[《走进 AI Agent》系列蒸馏笔记](docs/reading-notes/README.md)。
 
 ## 开始学习
 
